@@ -1,5 +1,6 @@
 import { getSudoku } from "sudoku-gen";
 import _ from 'lodash';
+import { BE_URL } from "./constants";
 
 /**
  * The function `createNewGame` generates a new Sudoku game with a specified difficulty level.
@@ -72,6 +73,10 @@ export const calculateGameRating = (timeTaken, timeLimit, errorCount, errorLimit
     return roundOffRating(rating); 
 }
 
+export const calculateScore = (rating)=>{
+  return (rating / 5) * 100;
+}
+
 export const calculatePlayerRating = (currentRating, totalGamesPlayed, thisGameRating)=>{
     const rating = (currentRating * (totalGamesPlayed - 1) + thisGameRating) / totalGamesPlayed;
     if (totalGamesPlayed == 0) return 0;
@@ -92,3 +97,57 @@ export const initializeNotes = () => {
     }
     return notes;
   };
+
+// export const saveScore = async (score, username)=>{
+//   try {
+//     const response = await fetch(BE_URL, {
+//       method: "POST",
+//       headers: {
+//         'Content-Type': 'application/json', 
+//       },
+//       body: JSON.stringify({
+//         score,
+//         userId: username,
+//         game: "sudoku"
+//       })
+//     })
+//     const data = await response.json();
+//     console.log(data);
+//     if (data.success){
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch(error){
+//     console.error(error);
+//     return false;
+//   }
+// }
+
+export const saveScore = async (score, username, password) => {
+  try {
+    const response = await fetch(`${BE_URL}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        score,
+        userId: username,
+        game: "sudoku",
+        password
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log(data);
+
+    return data.success ? true : false;
+  } catch (error) {
+    console.error('Error in saveScore:', error);
+    return false;
+  }
+};

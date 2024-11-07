@@ -1,8 +1,8 @@
 export const timeLimit = {
-    'easy': 180,
-    'medium': 240,
-    'hard': 360,
-    'expert': 480,
+    'easy': 240,
+    'medium': 360,
+    'hard': 480,
+    'expert': 600,
 }
 
 export const errorLimits = {
@@ -18,3 +18,6 @@ export const difficultyOptions = {
     'hard': 'master',
     'expert': 'legend'
 }
+
+export const BE_URL = import.meta.env.VITE_BE_URL;
+export const FE_URL = import.meta.env.VITE_FE_URL;

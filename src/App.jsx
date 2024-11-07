@@ -1,18 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { gameStateAtom } from "./atoms";
-import { calculateGameRating, createNewGame, initializeNotes } from "./functions";
+import { calculateGameRating, calculateScore, createNewGame, initializeNotes } from "./functions";
 import _ from 'lodash'
 import Game from "./Components/Game";
 import { errorLimits, timeLimit } from "./constants";
 import { GameLostAudio, GameStartAudio, GameWonAudio } from "../public";
+import Modal from "./Components/Modals/Modal";
+import SaveScoreCard from "./Components/Modals/SaveScoreCard";
 
 function App() {
 
   const [ game, setGame ] = useRecoilState(gameStateAtom)
   const gameLostAudio = new Audio(GameLostAudio);
   const gameWonAudio = new Audio(GameWonAudio);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // (Function to generate and set the new game state)
   const generateNewGame = useCallback(
@@ -93,6 +96,7 @@ function App() {
         hasWon:  !(game.errorCount >= errorLimits[game.data.difficulty]),
         rating: gameRating > 0 ? gameRating : 0,
       }));
+      setIsModalOpen(true);
 
     // Auto fill the last number
     // if only one number remains to be filled, it autofills and game is set over.
@@ -108,6 +112,7 @@ function App() {
         isRunning: false,
         rating: gameRating > 0 ? gameRating : 0,
       }))
+      setIsModalOpen(true);
     }
   }, [game.board, game.solution, setGame, game.errorCount, game.disabledNumbers, game.data.difficulty]);
 
@@ -314,6 +319,12 @@ function App() {
   return (
     <>
       <Game />
+      {isModalOpen && <Modal>
+        <SaveScoreCard 
+          closeCard={()=>setIsModalOpen(false)} 
+          score={calculateScore(game.rating)} 
+        />
+      </Modal>}
     </>
   )
 }
